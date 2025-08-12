@@ -1,0 +1,37 @@
+<div class="container min-vh-100 d-flex align-items-center justify-content-center py-4">
+  <div class="card shadow-sm w-100" style="max-width: 420px;">
+    <div class="card-body p-4">
+      <h4 class="mb-3 text-center">Oturum Aç</h4>
+
+      <form (ngSubmit)="submit()" [formGroup]="form" novalidate>
+        <!-- Username -->
+        <div class="mb-3">
+          <label class="form-label">Kullanıcı Adı</label>
+          <input
+            type="text"
+            class="form-control"
+            [class.is-invalid]="f.username.invalid && (f.username.touched || f.username.dirty)"
+            formControlName="username"
+            placeholder="kullanici_adi" />
+          <div class="invalid-feedback">Kullanıcı adı zorunludur.</div>
+        </div>
+
+        <!-- Password -->
+        <div class="mb-3">
+          <label class="form-label">Şifre</label>
+          <input
+            type="password"
+            class="form-control"
+            [class.is-invalid]="f.password.invalid && (f.password.touched || f.password.dirty)"
+            formControlName="password"
+            placeholder="••••••••" />
+          <div class="invalid-feedback">Şifre zorunludur.</div>
+        </div>
+
+        <button class="btn btn-primary w-100" type="submit" [disabled]="form.invalid">
+          Oturum Aç
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
