@@ -1,12 +1,14 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
+import Swal from 'sweetalert2';
 
+// Şifre eşleşme kontrolü
 const passwordMatchValidator = (): ValidatorFn => {
   return (group: AbstractControl): ValidationErrors | null => {
     const pass = group.get('password')?.value;
     const confirm = group.get('confirmPassword')?.value;
-    if (!pass || !confirm) return null;          // required'lar ayrı kontrol ediliyor
+    if (!pass || !confirm) return null; // required'lar ayrı kontrol ediliyor
     return pass === confirm ? null : { passwordMismatch: true };
   };
 };
@@ -21,6 +23,9 @@ const passwordMatchValidator = (): ValidatorFn => {
 })
 export class Register {
   private fb = inject(FormBuilder);
+  private router = inject(Router);
+
+  loading = false;
 
   form = this.fb.group({
     username: ['', Validators.required],
@@ -32,11 +37,46 @@ export class Register {
   get passwordMismatch() { return this.form.errors?.['passwordMismatch']; }
 
   submit() {
+    // Form geçersizse uyarı ver
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+
+      if (this.passwordMismatch) {
+        Swal.fire({
+          title: 'Hata',
+          text: 'Şifreler eşleşmiyor.',
+          icon: 'error',
+          confirmButtonText: 'Tamam'
+        });
+      } else {
+        Swal.fire({
+          title: 'Hata',
+          text: 'Lütfen tüm alanları doldurun.',
+          icon: 'error',
+          confirmButtonText: 'Tamam'
+        });
+      }
       return;
     }
-    // TODO: Kayıt API entegrasyonu
-    console.log('Register payload', this.form.value);
+
+    // Simülasyon: API isteği yerine 1sn bekleme
+    this.loading = true;
+    setTimeout(() => {
+      this.loading = false;
+
+      Swal.fire({
+        title: 'Kayıt Başarılı',
+        text: 'Giriş yapabilmek için lütfen oturum açın.',
+        icon: 'success',
+        timer: 1500,
+        showConfirmButton: false
+      }).then(() => {
+        this.router.navigateByUrl('/login');
+      });
+
+    }, 1000);
+
+    // API entegrasyonu yapıldığında:
+    // this.registerService.signUp(this.form.value).subscribe(...)
   }
 }

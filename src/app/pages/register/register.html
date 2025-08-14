@@ -1,50 +1,63 @@
 <div class="container min-vh-100 d-flex align-items-center justify-content-center py-4">
-  <div class="card shadow-sm w-100" style="max-width: 480px;">
+  <div class="card shadow-sm w-100" style="max-width: 420px;">
     <div class="card-body p-4">
       <h4 class="mb-3 text-center">Kayıt Ol</h4>
 
       <form (ngSubmit)="submit()" [formGroup]="form" novalidate>
+
         <!-- Username -->
         <div class="mb-3">
           <label class="form-label">Kullanıcı Adı</label>
-          <input type="text" class="form-control"
-                 [class.is-invalid]="f.username.invalid && (f.username.touched || f.username.dirty)"
-                 formControlName="username" placeholder="kullanici_adi" />
+          <input
+            type="text"
+            class="form-control"
+            [class.is-invalid]="f.username.invalid && (f.username.touched || f.username.dirty)"
+            formControlName="username"
+            placeholder="kullanici_adi" />
           <div class="invalid-feedback">Kullanıcı adı zorunludur.</div>
         </div>
 
         <!-- Password -->
         <div class="mb-3">
           <label class="form-label">Şifre</label>
-          <input type="password" class="form-control"
-                 [class.is-invalid]="f.password.invalid && (f.password.touched || f.password.dirty)"
-                 formControlName="password" placeholder="••••••••" />
+          <input
+            type="password"
+            class="form-control"
+            [class.is-invalid]="f.password.invalid && (f.password.touched || f.password.dirty)"
+            formControlName="password"
+            placeholder="••••••••" />
           <div class="invalid-feedback">Şifre zorunludur.</div>
         </div>
 
         <!-- Confirm Password -->
-        <div class="mb-2">
+        <div class="mb-3">
           <label class="form-label">Şifre (Tekrar)</label>
-          <input type="password" class="form-control"
-                 [class.is-invalid]="(f.confirmPassword.invalid && (f.confirmPassword.touched || f.confirmPassword.dirty)) || passwordMismatch"
-                 formControlName="confirmPassword" placeholder="••••••••" />
+          <input
+            type="password"
+            class="form-control"
+            [class.is-invalid]="f.confirmPassword.invalid && (f.confirmPassword.touched || f.confirmPassword.dirty) || passwordMismatch"
+            formControlName="confirmPassword"
+            placeholder="••••••••" />
           <div class="invalid-feedback">
-            <ng-container *ngIf="f.confirmPassword.invalid; else mismatch">
-              Şifre tekrar zorunludur.
-            </ng-container>
-            <ng-template #mismatch>Şifreler eşleşmiyor.</ng-template>
+            <span *ngIf="f.confirmPassword.invalid">Bu alan zorunludur.</span>
+            <span *ngIf="passwordMismatch">Şifreler eşleşmiyor.</span>
           </div>
         </div>
 
-        <!-- Form seviyesinde mismatch uyarısı -->
-        <div *ngIf="passwordMismatch" class="text-danger small mb-3">
-          Şifre ve Şifre (Tekrar) birbiriyle eşleşmelidir.
-        </div>
-
-        <button class="btn btn-success w-100" type="submit" [disabled]="form.invalid">
-          Kayıt Ol
+        <!-- Submit Button -->
+        <button class="btn btn-success w-100" type="submit" [disabled]="loading || form.invalid">
+          <span *ngIf="loading">Kayıt yapılıyor...</span>
+          <span *ngIf="!loading">Kayıt Ol</span>
         </button>
+
       </form>
+
+      <!-- Login link -->
+      <div class="text-center mt-3">
+        <small>Zaten hesabınız var mı?</small>
+        <a routerLink="/login" class="ms-1">Giriş Yap</a>
+      </div>
+
     </div>
   </div>
 </div>

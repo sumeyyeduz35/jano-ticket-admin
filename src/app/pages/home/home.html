@@ -1,0 +1,31 @@
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      
+      <div class="card shadow-sm border-0">
+        <div class="card-body text-center">
+          
+          <h4 class="mb-4">🏠 Ana Sayfa</h4>
+
+          <div *ngIf="userName; else noUser">
+            <p class="fs-5 mb-4">
+              <strong>Merhaba, {{ userName }}!</strong><br />
+              Girişiniz başarıyla doğrulandı.
+            </p>
+            <button 
+              class="btn btn-danger px-4"
+              (click)="logout()">
+              Çıkış Yap
+            </button>
+          </div>
+
+          <ng-template #noUser>
+            <p class="text-muted mb-0">Giriş yapılmamış.</p>
+          </ng-template>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

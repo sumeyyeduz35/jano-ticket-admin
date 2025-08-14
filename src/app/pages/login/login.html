@@ -4,6 +4,7 @@
       <h4 class="mb-3 text-center">Oturum Aç</h4>
 
       <form (ngSubmit)="submit()" [formGroup]="form" novalidate>
+
         <!-- Username -->
         <div class="mb-3">
           <label class="form-label">Kullanıcı Adı</label>
@@ -28,9 +29,12 @@
           <div class="invalid-feedback">Şifre zorunludur.</div>
         </div>
 
-        <button class="btn btn-primary w-100" type="submit" [disabled]="form.invalid">
-          Oturum Aç
+        <!-- Giriş Butonu -->
+        <button class="btn btn-primary w-100" type="submit" [disabled]="loading || form.invalid">
+          <span *ngIf="loading">Giriş yapılıyor...</span>
+          <span *ngIf="!loading">Oturum Aç</span>
         </button>
+
       </form>
     </div>
   </div>
