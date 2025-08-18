@@ -1,0 +1,10 @@
+.page { max-width: 1050px; margin: 6vh auto; padding: 16px; }
+.page__header { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.actions { display: flex; gap: 8px; align-items: center; }
+.actions input { padding: 8px 10px; border: 1px solid #ddd; border-radius: 8px; min-width: 260px; }
+.actions a, .actions button { padding: 8px 12px; border-radius: 10px; border: 0; cursor: pointer; }
+.tbl { width: 100%; border-collapse: collapse; margin-top: 12px; }
+.tbl th, .tbl td { text-align: left; padding: 10px 12px; border-bottom: 1px solid #eee; }
+.chip { padding: 4px 8px; border-radius: 999px; background: #f3f4f6; font-size: 12px; }
+.muted { opacity: .6; }
+.error { color: #b00020; }

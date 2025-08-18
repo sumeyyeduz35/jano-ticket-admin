@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import Swal from 'sweetalert2';
+import { NgIf } from '@angular/common';
 
 // Şifre eşleşme kontrolü
 const passwordMatchValidator = (): ValidatorFn => {
@@ -16,7 +17,7 @@ const passwordMatchValidator = (): ValidatorFn => {
 @Component({
   selector: 'jta-register',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterModule],
+  imports: [ReactiveFormsModule, RouterModule, NgIf],
   templateUrl: './register.html',
   styleUrls: ['./register.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush

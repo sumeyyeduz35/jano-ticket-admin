@@ -4,12 +4,6 @@ import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { USER_INFO_KEY } from '../login/login.types';
 
-interface StoredUser {
-  token: string;
-  userName: string;
-  role: string;
-}
-
 @Component({
   selector: 'jta-home',
   standalone: true,
@@ -28,15 +22,13 @@ export class Home implements OnInit {
     if (!raw) return;
 
     try {
-      const stored: StoredUser = JSON.parse(raw);
-      if (!stored?.token) return;
-
+      const stored = JSON.parse(raw);
       const payload = this.decodeJwtPayload(stored.token);
       if (payload?.userName) {
         this.userName = String(payload.userName);
       }
     } catch {
-      // JSON parse veya decode hatası
+      // ignore
     }
   }
 
@@ -63,7 +55,6 @@ export class Home implements OnInit {
     });
   }
 
-  /** JWT payload decode helper */
   private decodeJwtPayload(token: string): any | null {
     try {
       const base64Url = token.split('.')[1];

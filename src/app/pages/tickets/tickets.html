@@ -1,0 +1,40 @@
+<section class="page">
+  <header class="page__header">
+    <h1>Tickets</h1>
+    <div class="actions">
+      <input [(ngModel)]="q" placeholder="Ara: başlık, kişi, e-posta..." />
+      <button (click)="load()" [disabled]="loading">Yenile</button>
+      <a routerLink="/tickets/new">+ Yeni Ticket</a>
+    </div>
+  </header>
+
+  <div class="page__content">
+    <p *ngIf="loading">Yükleniyor…</p>
+    <p *ngIf="!loading && error" class="error">{{ error }}</p>
+
+    <table *ngIf="!loading && !error && filtered.length" class="tbl">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Başlık</th>
+          <th>Gönderen</th>
+          <th>E-posta</th>
+          <th>Durum</th>
+          <th>Oluşturma</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let t of filtered">
+          <td><code>{{ short(t.ticketID) }}</code></td>
+          <td>{{ t.title }}</td>
+          <td>{{ t.senderFullName }}</td>
+          <td>{{ t.senderEmail }}</td>
+          <td><span class="chip">{{ statusName(t.ticketStatus) }}</span></td>
+          <td>{{ t.createdAt | date:'dd.MM.yyyy HH:mm' }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p *ngIf="!loading && !error && !filtered.length" class="muted">Kayıt bulunamadı.</p>
+  </div>
+</section>

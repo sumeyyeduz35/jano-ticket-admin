@@ -1,0 +1,32 @@
+<section class="page">
+  <h1>Yeni Ticket</h1>
+
+  <form [formGroup]="form" (ngSubmit)="submit()" class="card">
+    <label>
+      Başlık
+      <input formControlName="title" placeholder="Ödeme ekranında hata alıyorum" />
+    </label>
+
+    <label>
+      Açıklama
+      <textarea formControlName="description" rows="5"
+        placeholder="Kredi kartı bilgilerini girdikten sonra 'Bilinmeyen hata' mesajı çıkıyor."></textarea>
+    </label>
+
+    <div class="grid">
+      <label>
+        Ad Soyad
+        <input formControlName="senderFullName" placeholder="Zeynep Arslan" />
+      </label>
+
+      <label>
+        E-posta
+        <input formControlName="senderEmail" placeholder="zeynep.arslan@example.com" />
+      </label>
+    </div>
+
+    <button type="submit" [disabled]="loading">
+      {{ loading ? 'Gönderiliyor…' : 'Ticket Oluştur' }}
+    </button>
+  </form>
+</section>
