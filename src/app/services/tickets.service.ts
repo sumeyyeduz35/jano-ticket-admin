@@ -1,38 +1,36 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, catchError, of } from 'rxjs';
-import { API_HOST } from '../api.config';
-import { ApiEnvelope, CreateTicketRequest, TicketDTO } from '../ticket.types';
+import { Observable, map } from 'rxjs';
+import { ApiItemResponse, ApiListResponse, CreateTicketRequest, Ticket } from '../ticket.types';
+
+const BASE = 'https://40368fbe-667d-4d7d-b6f6-4bea2bc79a27.mock.pstmn.io';
 
 @Injectable({ providedIn: 'root' })
-export class TicketsService {
+export class TicketService {
   private http = inject(HttpClient);
 
-  // POST /api/tickets
-  create(body: CreateTicketRequest): Observable<ApiEnvelope<TicketDTO>> {
-    const url = `${API_HOST}/api/tickets`;
-    return this.http.post<ApiEnvelope<TicketDTO>>(url, body).pipe(
-      catchError((err) =>
-        of<ApiEnvelope<TicketDTO>>({
-          status: 'Error',
-          message: err?.error?.message || 'İstek sırasında bir hata oluştu',
-          data: null
-        })
-      )
-    );
+  getList(): Observable<Ticket[]> {
+    return this.http
+      .get<ApiListResponse<Ticket>>(`${BASE}/api/tickets`)
+      .pipe(map(res => res.data));
   }
 
-  // GET /api/tickets
-  list(): Observable<ApiEnvelope<TicketDTO[]>> {
-    const url = `${API_HOST}/api/tickets`;
-    return this.http.get<ApiEnvelope<TicketDTO[]>>(url).pipe(
-      catchError((err) =>
-        of<ApiEnvelope<TicketDTO[]>>({
-          status: 'Error',
-          message: err?.error?.message || 'Liste alınırken bir hata oluştu',
-          data: null
-        })
-      )
-    );
+  getData(id: string): Observable<Ticket> {
+    return this.http
+      .get<ApiItemResponse<Ticket>>(`${BASE}/api/tickets/${id}`)
+      .pipe(map(res => res.data));
+  }
+
+  create(payload: CreateTicketRequest): Observable<Ticket> {
+    return this.http
+      .post<ApiItemResponse<Ticket>>(`${BASE}/api/tickets`, payload)
+      .pipe(map(res => res.data));
+  }
+
+  // Mock’ta persist etmeyebilir; UI akışı için var.
+  updateStatus(id: string, ticketStatus: number): Observable<Ticket> {
+    return this.http
+      .put<ApiItemResponse<Ticket>>(`${BASE}/api/tickets/${id}`, { ticketStatus })
+      .pipe(map(res => res.data));
   }
 }

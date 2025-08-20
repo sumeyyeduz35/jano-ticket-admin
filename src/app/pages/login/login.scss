@@ -1,1 +1,85 @@
-.min-vh-75 { min-height: 75vh; }
+// Lacivert cam efekti + okunaklı kontrast
+$navy-900: #001a33;
+$navy-800: #072a56;
+$primary:  #66a3ff;
+
+.login-wrap {
+  min-height: 100vh;
+  padding: 24px;
+  background: radial-gradient(1200px 800px at 10% 10%, #0b2a4d 0%, transparent 60%),
+              radial-gradient(1000px 700px at 90% 90%, #0a3a7a 0%, transparent 60%),
+              linear-gradient(135deg, $navy-900 0%, $navy-800 100%);
+}
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+
+  // glassmorphism
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: 0 12px 30px rgba(0,0,0,.25);
+}
+
+// Form elemanları
+.form-label { color: rgba(255,255,255,.9); }
+
+.form-control {
+  background: rgba(255,255,255,.10);
+  border: 1px solid rgba(255,255,255,.18);
+  color: #fff;
+
+  &::placeholder { color: rgba(255,255,255,.65); }
+
+  &:focus {
+    background: rgba(255,255,255,.14);
+    border-color: $primary;
+    box-shadow: 0 0 0 3px rgba($primary, .35);
+    color: #fff;
+  }
+}
+
+// Butonlar
+.btn-login {
+  background-color: #0e3a80;
+  border: none;
+  color: #fff;
+  font-weight: 600;
+  padding: 10px 14px;
+  border-radius: 10px;
+  transition: transform .12s ease, box-shadow .12s ease, background-color .2s;
+
+  &:hover {
+    background-color: #124a9f;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(14, 58, 128, .35);
+  }
+
+  &:disabled {
+    opacity: .7;
+    cursor: not-allowed;
+  }
+}
+
+.btn-register {
+  background: transparent;
+  border: 2px solid $primary;
+  color: $primary;
+  font-weight: 600;
+  padding: 10px 14px;
+  border-radius: 10px;
+  transition: transform .12s ease, box-shadow .12s ease, background-color .2s, color .2s;
+
+  &:hover {
+    background: $primary;
+    color: #0b1b3a;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(102,163,255,.4);
+  }
+}
+
+// Küçük ekranlardaki iç boşluk
+@media (max-width: 420px) {
+  .login-card { padding: 16px !important; }
+}

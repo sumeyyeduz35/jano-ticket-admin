@@ -1,0 +1,51 @@
+<!-- src/app/pages/ticket-list/ticket-list.html -->
+<div class="container mx-auto p-4">
+  <h2 class="text-xl font-semibold mb-4">📒 Ticket Listesi</h2>
+
+  <!-- Yükleniyor -->
+  <div *ngIf="loading" class="p-3 rounded border">Yükleniyor...</div>
+
+  <!-- Hata -->
+  <div *ngIf="!loading && errorMsg" class="p-3 rounded border border-red-300 text-red-700">
+    {{ errorMsg }}
+  </div>
+
+  <!-- Tablo -->
+  <table *ngIf="!loading && !errorMsg && tickets?.length" class="table w-full">
+    <thead>
+      <tr>
+        <th>Başlık</th>
+        <th>Açıklama</th>
+        <th>Gönderen Adı Soyadı</th>
+        <th>Gönderen E-Posta Adresi</th>
+        <th>Ticket Durumu</th>
+        <th>Gönderilme Tarihi</th>
+        <th>İşlem</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let t of tickets" class="hover:bg-gray-50">
+        <td>{{ t.title }}</td>
+        <td>{{ t.description }}</td>
+        <td>{{ t.senderFullName }}</td>
+        <td>{{ t.senderEmail }}</td>
+        <td>{{ label(t.ticketStatus) }}</td>
+        <td>{{ t.createdAt | date:'short' }}</td>
+        <td>
+          <a
+            [routerLink]="['/tickets', t.ticketID]"
+            class="text-blue-600 underline"
+            aria-label="Detay sayfasına git"
+          >
+            Detay
+          </a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Boş durum -->
+  <div *ngIf="!loading && !errorMsg && !tickets?.length" class="p-3 rounded border">
+    Henüz ticket bulunamadı.
+  </div>
+</div>

@@ -1,63 +1,70 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
+// src/app/pages/tickets/tickets.ts
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject } from '@angular/core';
+import { CommonModule, DatePipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { NgIf, NgFor, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TicketsService } from '../../services/tickets.service';
-import { TicketDTO } from '../../ticket.types';
+import { finalize } from 'rxjs/operators';
+
+import { TicketService } from '../../services/tickets.service';
+import { Ticket, statusLabel } from '../../ticket.types';
 
 @Component({
   selector: 'jta-tickets',
   standalone: true,
-  imports: [RouterModule, NgIf, NgFor, FormsModule, DatePipe],
+  imports: [CommonModule, RouterModule, FormsModule, DatePipe],
   templateUrl: './tickets.html',
   styleUrls: ['./tickets.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class Tickets implements OnInit {
-  private svc = inject(TicketsService);
-  private cdr = inject(ChangeDetectorRef);
+export class Tickets {
+  private readonly svc: TicketService = inject(TicketService);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   loading = false;
-  error = '';
-  items: TicketDTO[] = [];
-  q = ''; // arama
+  error: string | null = null;
+  items: Ticket[] = [];
+  q = ''; // arama metni
 
-  ngOnInit() { this.load(); }
-
-  load() {
-    this.loading = true; this.error = '';
-    this.svc.list().subscribe(res => {
-      this.loading = false;
-      if (res.status === 'Success' && res.data) {
-        this.items = res.data;
-      } else {
-        this.error = res.message ?? 'Liste alınamadı';
-      }
-      this.cdr.markForCheck();
-    });
+  ngOnInit(): void {
+    this.load();
   }
 
-  // basit durum adı
-  statusName(code: number) {
-    switch (code) {
-      case 0: return 'Open';
-      case 1: return 'In Progress';
-      case 2: return 'Resolved';
-      case 3: return 'Closed';
-      default: return `#${code}`;
-    }
+  load(): void {
+    this.loading = true;
+    this.error = null;
+
+    this.svc.getList()
+      .pipe(finalize(() => { this.loading = false; this.cdr.markForCheck(); }))
+      .subscribe({
+        next: (arr: Ticket[]) => {
+          this.items = arr ?? [];
+        },
+        error: (e: unknown) => {
+          console.error(e);
+          this.items = [];
+          this.error = 'Liste alınamadı';
+        }
+      });
   }
 
-  short(id: string) { return id?.slice(0, 8); }
+  /** Durum kodunu etikete çevirir (0: Yeni, 1: Aktif, 2: İptal Edildi, 3: Çözüldü) */
+  statusName(code: number): string {
+    return statusLabel(code);
+  }
 
-  get filtered() {
+  short(id: string): string {
+    return id?.slice(0, 8) ?? '';
+  }
+
+  /** Arama filtresi */
+  get filtered(): Ticket[] {
     const s = this.q.trim().toLowerCase();
     if (!s) return this.items;
     return this.items.filter(x =>
-      x.title.toLowerCase().includes(s) ||
-      x.senderFullName.toLowerCase().includes(s) ||
-      x.senderEmail.toLowerCase().includes(s) ||
-      x.description.toLowerCase().includes(s)
+      (x.title ?? '').toLowerCase().includes(s) ||
+      (x.senderFullName ?? '').toLowerCase().includes(s) ||
+      (x.senderEmail ?? '').toLowerCase().includes(s) ||
+      (x.description ?? '').toLowerCase().includes(s)
     );
   }
 }

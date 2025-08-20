@@ -1,24 +1,25 @@
+// src/app/pages/ticket-new/ticket-new.ts
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';                // *ngIf vs. için
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { NgIf } from '@angular/common';
 import Swal from 'sweetalert2';
 
-import { TicketsService } from '../../services/tickets.service';
-import { CreateTicketRequest } from '../../ticket.types';
+import { TicketService } from '../../services/tickets.service';  // ✅ tekil dosya/isim
+import { CreateTicketRequest, Ticket } from '../../ticket.types';
 
 @Component({
   selector: 'jta-ticket-new',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterModule, NgIf],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],   // ✅ CommonModule eklendi
   templateUrl: './ticket-new.html',
   styleUrls: ['./ticket-new.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TicketNew {
-  private fb = inject(FormBuilder);
-  private svc = inject(TicketsService);
-  private router = inject(Router);
+  private readonly fb = inject(FormBuilder);
+  private readonly svc: TicketService = inject(TicketService);  // ✅ tip net
+  private readonly router = inject(Router);
 
   loading = false;
 
@@ -37,22 +38,25 @@ export class TicketNew {
     }
 
     this.loading = true;
-    const payload = this.form.value as CreateTicketRequest;
+    const payload: CreateTicketRequest = this.form.value as CreateTicketRequest;
 
-    this.svc.create(payload).subscribe(res => {
-      this.loading = false;
-
-      if (res.status === 'Success' && res.data) {
+    // ✅ create() artık Ticket döndürüyor
+    this.svc.create(payload).subscribe({
+      next: (created: Ticket) => {
+        this.loading = false;
         Swal.fire({
           icon: 'success',
           title: 'Ticket oluşturuldu',
-          text: `ID: ${res.data.ticketID}`
+          text: `ID: ${created.ticketID}`
         }).then(() => this.router.navigateByUrl('/tickets'));
-      } else {
+      },
+      error: (err: unknown) => {
+        this.loading = false;
+        console.error(err);
         Swal.fire({
           icon: 'error',
           title: 'Oluşturma başarısız',
-          text: res.message ?? 'Bilinmeyen hata'
+          text: 'İstek sırasında bir hata oluştu.'
         });
       }
     });

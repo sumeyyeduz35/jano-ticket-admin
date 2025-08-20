@@ -1,31 +1,41 @@
-<div class="container py-5">
-  <div class="row justify-content-center">
-    <div class="col-md-6">
-      
-      <div class="card shadow-sm border-0">
-        <div class="card-body text-center">
-          
-          <h4 class="mb-4">🏠 Ana Sayfa</h4>
+<div class="home-wrap py-5">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="home-card shadow-lg border-0 rounded-4 p-4">
+
+          <h4 class="mb-3 text-white">🏠 Ana Sayfa</h4>
 
           <div *ngIf="userName; else noUser">
-            <p class="fs-5 mb-4">
-              <strong>Merhaba, {{ userName }}!</strong><br />
-              Girişiniz başarıyla doğrulandı.
+            <p class="lead mb-4 text-white-50">
+              <strong>Hoş geldin, {{ userName }}!</strong>
             </p>
-            <button 
-              class="btn btn-danger px-4"
-              (click)="logout()">
+
+            <div class="row g-3">
+              <div class="col-sm-6 col-md-4">
+                <a routerLink="/tickets/new" class="btn btn-action w-100">+ Ticket Ekle</a>
+              </div>
+              <div class="col-sm-6 col-md-4">
+                <a routerLink="/ticket-list" class="btn btn-action w-100">Ticket Listele</a>
+              </div>
+              <div class="col-sm-6 col-md-4">
+                <a routerLink="/tickets" class="btn btn-action w-100">Tüm Ticketlar</a>
+              </div>
+            </div>
+
+            <hr class="my-4 hr-soft" />
+
+            <button class="btn btn-danger px-4" (click)="logout()">
               Çıkış Yap
             </button>
           </div>
 
           <ng-template #noUser>
-            <p class="text-muted mb-0">Giriş yapılmamış.</p>
+            <p class="text-white-50 mb-0">Giriş yapılmamış.</p>
           </ng-template>
 
         </div>
       </div>
-
     </div>
   </div>
 </div>

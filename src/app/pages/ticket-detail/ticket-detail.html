@@ -1,0 +1,51 @@
+<!-- src/app/pages/ticket-detail/ticket-detail.html -->
+<div class="container mx-auto p-6">
+  <div class="flex items-center justify-between mb-4">
+    <h2 class="text-2xl font-semibold">🎫 Ticket Detayı</h2>
+    <a [routerLink]="['/tickets']" class="btn btn-outline">← Listeye Dön</a>
+  </div>
+
+  <div *ngIf="loading" class="p-3 rounded border">Yükleniyor...</div>
+  <div *ngIf="!loading && errorMsg" class="p-3 rounded border border-red-300 text-red-700">{{ errorMsg }}</div>
+
+  <div *ngIf="!loading && !errorMsg && ticket" class="grid gap-4">
+    <div class="p-4 rounded border">
+      <div class="text-sm text-gray-500">Başlık</div>
+      <div class="font-semibold">{{ ticket.title }}</div>
+    </div>
+
+    <div class="p-4 rounded border">
+      <div class="text-sm text-gray-500">Açıklama</div>
+      <div>{{ ticket.description }}</div>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-4">
+      <div class="p-4 rounded border">
+        <div class="text-sm text-gray-500">Gönderen</div>
+        <div>{{ ticket.senderFullName }}</div>
+        <div class="text-sm text-gray-600">{{ ticket.senderEmail }}</div>
+      </div>
+
+      <div class="p-4 rounded border">
+        <div class="text-sm text-gray-500">Gönderilme Tarihi</div>
+        <div>{{ ticket.createdAt | date:'short' }}</div>
+      </div>
+    </div>
+
+    <!-- Durum (tek düzenlenebilir alan) -->
+    <form [formGroup]="form" class="p-4 rounded border grid gap-3">
+      <label class="text-sm text-gray-500">Ticket Durumu</label>
+      <select formControlName="ticketStatus" class="input border p-2 rounded">
+        <option *ngFor="let o of options" [value]="o.value">{{ o.label }}</option>
+      </select>
+
+      <button type="button" class="btn btn-primary w-fit" [disabled]="saving" (click)="save()">
+        {{ saving ? 'Kaydediliyor...' : 'Kaydet' }}
+      </button>
+
+      <div class="text-xs text-gray-500">
+        * Bu API mock olduğundan, güncelleme yanıtı kalıcı olmayabilir.
+      </div>
+    </form>
+  </div>
+</div>
