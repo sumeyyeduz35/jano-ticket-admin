@@ -1,4 +1,3 @@
-// src/app/pages/ticket-list/ticket-list.ts
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -30,23 +29,23 @@ export class TicketList {
   private fetch() {
     this.loading = true;
     this.errorMsg = null;
-    this.cdr.markForCheck(); // 🔔 ilk değişikliği de bildir
+    this.cdr.markForCheck(); // ilk değişikliği de bildir
 
     this.srv.getList()
       .pipe(finalize(() => {
         this.loading = false;
-        this.cdr.markForCheck(); // 🔔 her durumda loading=false yansısın
+        this.cdr.markForCheck(); // her durumda loading=false yansısın
       }))
       .subscribe({
         next: (list: Ticket[]) => {
           this.tickets = list ?? [];
-          this.cdr.markForCheck(); // 🔔 veri yansısın
+          this.cdr.markForCheck(); // veri yansısın
           // console.log('tickets length:', this.tickets.length);
         },
         error: (e: unknown) => {
           console.error('getList error', e);
           this.errorMsg = 'Liste alınamadı';
-          this.cdr.markForCheck(); // 🔔 hata yansısın
+          this.cdr.markForCheck(); // hata yansısın
         },
       });
   }

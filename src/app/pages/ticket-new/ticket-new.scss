@@ -4,4 +4,5 @@ label { display: grid; gap: 6px; font-size: 14px; }
 input, textarea { padding: 10px 12px; border: 1px solid #ddd; border-radius: 10px; }
 .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 button { padding: 10px 14px; border: 0; border-radius: 12px; cursor: pointer; }
+.error { color: #b3261e; font-size: 12px; }
 @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }

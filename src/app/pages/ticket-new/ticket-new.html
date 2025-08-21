@@ -1,30 +1,48 @@
 <section class="page">
   <h1>Yeni Ticket</h1>
 
+  <!-- Form: gönderimde submit() çalışır -->
   <form [formGroup]="form" (ngSubmit)="submit()" class="card">
+    <!-- Başlık -->
     <label>
       Başlık
-      <input formControlName="title" placeholder="Ödeme ekranında hata alıyorum" />
+      <input formControlName="title" placeholder="Ödeme ekranında hata alıyorum" [disabled]="loading" />
+      <small class="error" *ngIf="form.controls.title.touched && form.controls.title.invalid">
+        Başlık zorunlu ve 200 karakteri geçmemeli.
+      </small>
     </label>
 
+    <!-- Açıklama -->
     <label>
       Açıklama
       <textarea formControlName="description" rows="5"
-        placeholder="Kredi kartı bilgilerini girdikten sonra 'Bilinmeyen hata' mesajı çıkıyor."></textarea>
+        placeholder="Kredi kartı bilgilerini girdikten sonra 'Bilinmeyen hata' mesajı çıkıyor."
+        [disabled]="loading"></textarea>
+      <small class="error" *ngIf="form.controls.description.touched && form.controls.description.invalid">
+        Açıklama zorunlu ve 2000 karakteri geçmemeli.
+      </small>
     </label>
 
+    <!-- Gönderen bilgileri -->
     <div class="grid">
       <label>
         Ad Soyad
-        <input formControlName="senderFullName" placeholder="Zeynep Arslan" />
+        <input formControlName="senderFullName" placeholder="Zeynep Arslan" [disabled]="loading" />
+        <small class="error" *ngIf="form.controls.senderFullName.touched && form.controls.senderFullName.invalid">
+          Ad soyad zorunlu ve 100 karakteri geçmemeli.
+        </small>
       </label>
 
       <label>
         E-posta
-        <input formControlName="senderEmail" placeholder="zeynep.arslan@example.com" />
+        <input formControlName="senderEmail" placeholder="zeynep.arslan@example.com" [disabled]="loading" />
+        <small class="error" *ngIf="form.controls.senderEmail.touched && form.controls.senderEmail.invalid">
+          Geçerli bir e‑posta girin (120 karakter sınırı).
+        </small>
       </label>
     </div>
 
+    <!-- Gönder butonu -->
     <button type="submit" [disabled]="loading">
       {{ loading ? 'Gönderiliyor…' : 'Ticket Oluştur' }}
     </button>
