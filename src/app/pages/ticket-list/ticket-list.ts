@@ -1,7 +1,13 @@
+// Liste sayfası
+// - OnPush + Http istekleri: finalize() içinde markForCheck() ile UI'yı yenile
+// - confirmDelete(): onay popup → delete()
+// - delete(): başarıda listeyi yenile
+
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { finalize } from 'rxjs/operators';
+import Swal from 'sweetalert2';
 
 import { TicketService } from '../../services/tickets.service';
 import { Ticket, statusLabel } from '../../ticket.types';
@@ -12,43 +18,67 @@ import { Ticket, statusLabel } from '../../ticket.types';
   imports: [CommonModule, RouterModule],
   templateUrl: './ticket-list.html',
   styleUrls: ['./ticket-list.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TicketList {
-  private readonly srv: TicketService = inject(TicketService);
+  private readonly svc = inject(TicketService);
   private readonly cdr = inject(ChangeDetectorRef);
 
+  loading = false;           // spinner/disable
+  errorMsg = '';             // üst uyarı alanı
   tickets: Ticket[] = [];
-  loading = false;
-  errorMsg: string | null = null;
+  label = statusLabel;       // durum etiketleyici
 
-  ngOnInit() {
-    this.fetch();
-  }
-
-  private fetch() {
+  /** Listeyi yenile */
+  load() {
     this.loading = true;
-    this.errorMsg = null;
-    this.cdr.markForCheck(); // ilk değişikliği de bildir
+    this.errorMsg = '';
+    this.cdr.markForCheck(); // ilk state değişimini bildir
 
-    this.srv.getList()
-      .pipe(finalize(() => {
-        this.loading = false;
-        this.cdr.markForCheck(); // her durumda loading=false yansısın
-      }))
+    this.svc.getList()
+      .pipe(finalize(() => { this.loading = false; this.cdr.markForCheck(); }))
       .subscribe({
-        next: (list: Ticket[]) => {
-          this.tickets = list ?? [];
-          this.cdr.markForCheck(); // veri yansısın
-          // console.log('tickets length:', this.tickets.length);
+        next: (list) => {
+          this.tickets = list;
+          // finalize() zaten loading=false + markForCheck yapıyor
         },
-        error: (e: unknown) => {
-          console.error('getList error', e);
-          this.errorMsg = 'Liste alınamadı';
-          this.cdr.markForCheck(); // hata yansısın
-        },
+        error: (err) => {
+          this.errorMsg = (err?.message ?? 'Liste alınamadı');
+          // finalize() zaten markForCheck yapıyor
+        }
       });
   }
 
-  label(s: number) { return statusLabel(s); }
+  ngOnInit() { this.load(); }
+
+  /** Satırdaki Sil butonu → onay penceresi */
+  confirmDelete(ticket: Ticket) {
+    Swal.fire({
+      icon: 'warning',
+      title: "Ticket'ı silmek istediğinizden emin misiniz?",
+      text: `#${ticket.ticketID} - ${ticket.title}`,
+      showCancelButton: true,
+      confirmButtonText: 'Onayla',
+      cancelButtonText: 'Vazgeç',
+      confirmButtonColor: '#d33'
+    }).then(r => { if (r.isConfirmed) this.delete(ticket.ticketID); });
+  }
+
+  /** API'ye DELETE çağrısı; başarıda listeyi yenile */
+  private delete(id: string) {
+    this.loading = true;
+    this.cdr.markForCheck();
+
+    this.svc.delete(id)
+      .pipe(finalize(() => { this.loading = false; this.cdr.markForCheck(); }))
+      .subscribe({
+        next: ({ ticketID, message }) => {
+          Swal.fire({ icon: 'success', title: 'Silindi', text: message || `#${ticketID} silindi.` });
+          this.load(); // yeniden çek
+        },
+        error: (err) => {
+          Swal.fire({ icon: 'error', title: 'Silinemedi', text: err?.message || 'Kayıt silinemedi!' });
+        }
+      });
+  }
 }

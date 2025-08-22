@@ -1,24 +1,50 @@
-<!-- src/app/pages/ticket-detail/ticket-detail.html -->
 <div class="container mx-auto p-6">
+  <!-- Üst başlık ve aksiyon alanı -->
   <div class="flex items-center justify-between mb-4">
-    <h2 class="text-2xl font-semibold">🎫 Ticket Detayı</h2>
-    <a [routerLink]="['/tickets']" class="btn btn-outline">← Listeye Dön</a>
+    <h2 class="text-2xl font-semibold"> Ticket Detayı</h2>
+
+    <div class="flex items-center gap-3">
+      <!-- Listeye dönüş -->
+      <a [routerLink]="['/tickets']" class="btn btn-outline" aria-label="Listeye dön">
+        ← Listeye Dön
+      </a>
+
+      <!-- Sil (onay popup'ı için TS tarafında confirmDelete() var) -->
+      <button
+        type="button"
+        class="btn btn-error"
+        [disabled]="saving || loading"
+        (click)="confirmDelete()"
+        aria-label="Ticket'ı sil"
+      >
+        Sil
+      </button>
+    </div>
   </div>
 
+  <!-- Yükleniyor durumu -->
   <div *ngIf="loading" class="p-3 rounded border">Yükleniyor...</div>
-  <div *ngIf="!loading && errorMsg" class="p-3 rounded border border-red-300 text-red-700">{{ errorMsg }}</div>
 
+  <!-- Hata mesajı -->
+  <div *ngIf="!loading && errorMsg" class="p-3 rounded border border-red-300 text-red-700">
+    {{ errorMsg }}
+  </div>
+
+  <!-- Detay içeriği -->
   <div *ngIf="!loading && !errorMsg && ticket" class="grid gap-4">
+    <!-- Başlık -->
     <div class="p-4 rounded border">
       <div class="text-sm text-gray-500">Başlık</div>
       <div class="font-semibold">{{ ticket.title }}</div>
     </div>
 
+    <!-- Açıklama -->
     <div class="p-4 rounded border">
       <div class="text-sm text-gray-500">Açıklama</div>
       <div>{{ ticket.description }}</div>
     </div>
 
+    <!-- Gönderen ve tarih -->
     <div class="grid md:grid-cols-2 gap-4">
       <div class="p-4 rounded border">
         <div class="text-sm text-gray-500">Gönderen</div>
@@ -35,16 +61,25 @@
     <!-- Durum (tek düzenlenebilir alan) -->
     <form [formGroup]="form" class="p-4 rounded border grid gap-3">
       <label class="text-sm text-gray-500">Ticket Durumu</label>
-      <select formControlName="ticketStatus" class="input border p-2 rounded">
+
+      <!-- Durum seçimi -->
+      <select formControlName="ticketStatus" class="input border p-2 rounded" [disabled]="saving || loading">
         <option *ngFor="let o of options" [value]="o.value">{{ o.label }}</option>
       </select>
 
-      <button type="button" class="btn btn-primary w-fit" [disabled]="saving" (click)="save()">
+      <!-- Kaydet butonu -->
+      <button
+        type="button"
+        class="btn btn-primary w-fit"
+        [disabled]="saving || loading"
+        (click)="save()"
+      >
         {{ saving ? 'Kaydediliyor...' : 'Kaydet' }}
       </button>
 
+      <!-- Bilgi notu -->
       <div class="text-xs text-gray-500">
-        * Bu API mock olduğundan, güncelleme yanıtı kalıcı olmayabilir.
+        * Bu API mock olduğundan, güncelleme/silme yanıtları kalıcı olmayabilir.
       </div>
     </form>
   </div>

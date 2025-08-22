@@ -1,14 +1,14 @@
 /**
  * TicketService
- * - Liste / detay: mock API'nin standart list/item sarmalayıcılarını okur
- * - Oluşturma (POST): Success/Error ayrımını yapar, hatada anlamlı mesaj üretir
- * - Durum güncelleme (PUT): mock item veya Success sarmalayıcısını tolere eder
+ * - Liste/Detay: GET
+ * - Oluşturma:   POST (Success/Error sözleşmesi)
+ * - Durum:       PUT   (item/Success sarmalayıcılarını tolere eder)
+ * - Silme:       DELETE (Success/Error sözleşmesi)
  */
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, catchError, map, throwError } from 'rxjs';
 
-// Tipler tek merkezden: src/app/ticket.types.ts
 import {
   ApiItemResponse,
   ApiListResponse,
@@ -19,16 +19,14 @@ import {
   ApiError,
 } from '../ticket.types';
 
-// Mock API kök adresi (aynı kaldı)
+// Mock API kök adresi
 const BASE = 'https://40368fbe-667d-4d7d-b6f6-4bea2bc79a27.mock.pstmn.io';
 
 @Injectable({ providedIn: 'root' })
 export class TicketService {
   private http = inject(HttpClient);
 
-  /**
-   * Genel HTTP hata yakalayıcı (network/4xx/5xx)
-   */
+  /** Ortak HTTP hata işleyici (network/4xx/5xx → ApiError) */
   private handleHttpError = (e: HttpErrorResponse | Error) => {
     const message =
       e instanceof HttpErrorResponse
@@ -38,9 +36,7 @@ export class TicketService {
     return throwError(() => err);
   };
 
-  /**
-   * Ticket listesini çeker: GET /api/tickets
-   */
+  /** Liste: GET /api/tickets */
   getList(): Observable<Ticket[]> {
     return this.http
       .get<ApiListResponse<Ticket>>(`${BASE}/api/tickets`)
@@ -54,9 +50,7 @@ export class TicketService {
       );
   }
 
-  /**
-   * Tek ticket detayını çeker: GET /api/tickets/:id
-   */
+  /** Detay: GET /api/tickets/:id */
   getData(id: string): Observable<Ticket> {
     return this.http
       .get<ApiItemResponse<Ticket>>(`${BASE}/api/tickets/${id}`)
@@ -70,20 +64,17 @@ export class TicketService {
       );
   }
 
-  /**
-   * Yeni ticket oluşturur: POST /api/tickets
-   * Backend sözleşmesi: Success/Error ayrımı
-   */
+  /** Oluştur: POST /api/tickets (Success/Error sözleşmesi) */
   create(payload: CreateTicketRequest): Observable<Ticket> {
     return this.http
       .post<ApiResponse<Ticket>>(`${BASE}/api/tickets`, payload)
       .pipe(
         map((res) => {
-          // Success: { status: 'Success', data: Ticket }
+          // Success: { status:'Success', data: Ticket }
           if ((res as ApiSuccess<Ticket>)?.status === 'Success') {
             return (res as ApiSuccess<Ticket>).data;
           }
-          // Error: { status: 'Error', message, data: null }
+          // Error: { status:'Error', message }
           const err = res as ApiError;
           throw new Error(err?.message || 'Ticket oluşturulamadı');
         }),
@@ -91,10 +82,7 @@ export class TicketService {
       );
   }
 
-  /**
-   * Ticket durumunu günceller: PUT /api/tickets/:id
-   * Mock bazen item sarmalar, bazen Success döndürebilir; iki durumu da işler.
-   */
+  /** Durum güncelle: PUT /api/tickets/:id (item/Success formatlarını destekler) */
   updateStatus(id: string, ticketStatus: number): Observable<Ticket> {
     return this.http
       .put<ApiItemResponse<Ticket> | ApiResponse<Ticket>>(
@@ -102,7 +90,7 @@ export class TicketService {
         { ticketStatus }
       )
       .pipe(
-        map((res: ApiItemResponse<Ticket> | ApiResponse<Ticket>) => {
+        map((res) => {
           // 1) Success sarmalayıcı
           if ((res as ApiSuccess<Ticket>)?.status === 'Success') {
             return (res as ApiSuccess<Ticket>).data;
@@ -114,6 +102,25 @@ export class TicketService {
           // 3) Error sarmalayıcı
           const err = res as ApiError;
           throw new Error(err?.message || 'Durum güncellenemedi');
+        }),
+        catchError(this.handleHttpError)
+      );
+  }
+
+  /** Sil: DELETE /api/tickets/:id (Success/Error sözleşmesi) */
+  delete(id: string): Observable<{ ticketID: string; message: string | null }> {
+    return this.http
+      .delete<ApiResponse<{ ticketID: string }>>(`${BASE}/api/tickets/${id}`)
+      .pipe(
+        map((res) => {
+          // Success: { status:'Success', message, data:{ ticketID } }
+          if ((res as ApiSuccess<{ ticketID: string }>).status === 'Success') {
+            const ok = res as ApiSuccess<{ ticketID: string }>;
+            return { ticketID: ok.data.ticketID, message: ok.message };
+          }
+          // Error: { status:'Error', message }
+          const err = res as ApiError;
+          throw new Error(err?.message || 'Kayıt silinemedi! Lütfen tekrar deneyiniz.');
         }),
         catchError(this.handleHttpError)
       );

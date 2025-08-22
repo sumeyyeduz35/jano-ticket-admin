@@ -1,11 +1,17 @@
+// Amaç:
+// - Route param ile ticket detayını çek (GET)
+// - Durum güncelle (PUT) → SweetAlert ile geri bildirim
+// - Sil (DELETE) → onay popup, başarıda listeye dön
+
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { finalize } from 'rxjs/operators';
+import Swal from 'sweetalert2';
+
 import { TicketService } from '../../services/tickets.service';
 import { Ticket, TICKET_STATUS_OPTIONS, statusLabel } from '../../ticket.types';
-
 
 @Component({
   selector: 'jta-ticket-detail',
@@ -16,21 +22,27 @@ import { Ticket, TICKET_STATUS_OPTIONS, statusLabel } from '../../ticket.types';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TicketDetail {
+  // DI
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
   private readonly srv: TicketService = inject(TicketService);
 
+  // UI state
   ticket: Ticket | null = null;
-  loading = true;
-  saving = false;
+  loading = true;          // detay yükleniyor
+  saving = false;          // durum güncelle/sil işlemi
   errorMsg: string | null = null;
 
+  // Form (yalnızca durum güncelleme için)
   form = this.fb.group({ ticketStatus: [0] });
 
+  // Yardımcılar
   options = TICKET_STATUS_OPTIONS;
   label = statusLabel;
 
+  /** İlk yüklemede route param ile kayıt çek */
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
     if (!id) {
@@ -56,6 +68,7 @@ export class TicketDetail {
       });
   }
 
+  /** Durumu güncelle (PUT) */
   save() {
     if (!this.ticket) return;
     const id = this.ticket.ticketID;
@@ -66,13 +79,55 @@ export class TicketDetail {
       .pipe(finalize(() => { this.saving = false; this.cdr.markForCheck(); }))
       .subscribe({
         next: (updated: Ticket) => {
+          // UI'yı senkron tut
           this.ticket = { ...this.ticket!, ticketStatus: updated.ticketStatus ?? status };
           this.cdr.markForCheck();
-          alert('Durum güncellendi (mock).');
+
+          Swal.fire({ icon: 'success', title: 'Durum güncellendi', timer: 1300, showConfirmButton: false });
         },
         error: (e: unknown) => {
           console.error(e);
-          alert('Güncelleme başarısız (mock API).');
+          Swal.fire({ icon: 'error', title: 'Güncelleme başarısız', text: 'Lütfen tekrar deneyin.' });
+        }
+      });
+  }
+
+  /** Sağ üst 'Sil' butonu → onay popup */
+  confirmDelete() {
+    if (!this.ticket) return;
+
+    Swal.fire({
+      icon: 'warning',
+      title: "Ticket'ı silmek istediğinizden emin misiniz?",
+      text: `#${this.ticket.ticketID} - ${this.ticket.title}`,
+      showCancelButton: true,
+      confirmButtonText: 'Onayla',
+      cancelButtonText: 'Vazgeç',
+      confirmButtonColor: '#d33'
+    }).then(r => {
+      if (r.isConfirmed) this.delete(this.ticket!.ticketID);
+    });
+  }
+
+  /** Sil (DELETE), başarıda listeye dön */
+  private delete(id: string) {
+    this.saving = true;
+    this.srv.delete(id)
+      .pipe(finalize(() => { this.saving = false; this.cdr.markForCheck(); }))
+      .subscribe({
+        next: ({ ticketID, message }) => {
+          Swal.fire({
+            icon: 'success',
+            title: 'Silindi',
+            text: message || `Ticket başarıyla silindi (#${ticketID}).`
+          }).then(() => this.router.navigateByUrl('/tickets'));
+        },
+        error: (err) => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Silinemedi',
+            text: err?.message || 'Kayıt silinemedi! Lütfen tekrar deneyiniz.'
+          });
         }
       });
   }
