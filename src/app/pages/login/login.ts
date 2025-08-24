@@ -1,3 +1,4 @@
+// Bu bileşen, kullanıcı giriş ekranını yönetir: form doğrulama, LoginService üzerinden giriş ve başarılı giriş sonrası yönlendirme.
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -5,6 +6,8 @@ import { CommonModule } from '@angular/common';
 import Swal from 'sweetalert2';
 import { LoginService } from '../../services/login.service';
 import { UserLoginModel } from './login.types';
+
+//------------------------------------------------------------------------------------
 
 @Component({
   selector: 'jta-login',
@@ -21,6 +24,7 @@ export class Login {
 
   loading = false;
 
+  //form tanımı
   form = this.fb.group({
     username: ['', Validators.required],
     password: ['', Validators.required],

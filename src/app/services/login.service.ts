@@ -1,8 +1,10 @@
-// src/app/services/login.service.ts
+// Bu servis, sahte (mock) giriş akışını yönetir: admin/12345 için fake JWT üretir, localStorage’a yazar ve oturumu sonlandırmayı sağlar.
 import { Injectable } from '@angular/core';
 import { Observable, of, throwError } from 'rxjs';
 import { delay, tap } from 'rxjs/operators';
 import { UserLoginModel, SignInResult, USER_INFO_KEY } from '../pages/login/login.types';
+
+//----------------------------------------------------------------------
 
 @Injectable({ providedIn: 'root' })
 export class LoginService {
@@ -21,10 +23,13 @@ export class LoginService {
     return `${headerPart}.${payloadPart}.${signaturePart}`;
   }
 
+
+ //giriş işlemi (admin/12345 doğrulaması) 
   signIn(model: UserLoginModel): Observable<SignInResult> {
     const { userName, password } = model;
 
     if (!userName || !password) {
+      //zorunlu alanlar yoksa hata döndür
       return throwError(() => ({
         success: false,
         message: 'Kullanıcı bulunamadı'
@@ -34,7 +39,8 @@ export class LoginService {
     if (userName === 'admin' && password === '12345') {
       const exp = Math.floor(Date.now() / 1000) + 60 * 60; // 1 saatlik süre
       const token = this.createFakeJwt({ userName, role: 'Admin', exp });
-
+      
+      //başarılı giriş - token üret, kısa gecikme ver, localStorage'a yaz
       return of({ success: true, token } as SignInResult).pipe(
         delay(300),
         tap((res) => {
@@ -51,6 +57,7 @@ export class LoginService {
       );
     }
 
+    //yanlış kullanıcı adı/sifre
     return throwError(() => ({
       success: false,
       message: 'Kullanıcı bulunamadı'
@@ -69,7 +76,7 @@ export class LoginService {
     }
   }
 
-  // Çıkış için
+  // Çıkış - oturum bilgisini temizle
   signOut(): void {
     localStorage.removeItem(USER_INFO_KEY);
   }

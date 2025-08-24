@@ -1,17 +1,17 @@
-// Amaç:
-// - Route param ile ticket detayını çek (GET)
-// - Durum güncelle (PUT) → SweetAlert ile geri bildirim
-// - Sil (DELETE) → onay popup, başarıda listeye dön
-
+/**Amaç:
+- Route param ile ticket detayını çek (GET)
+- Durum güncelle (PUT) → SweetAlert ile geri bildirim
+- Sil (DELETE) → onay popup, başarıda listeye dön*/
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { finalize } from 'rxjs/operators';
 import Swal from 'sweetalert2';
-
 import { TicketService } from '../../services/tickets.service';
 import { Ticket, TICKET_STATUS_OPTIONS, statusLabel } from '../../ticket.types';
+
+//--------------------------------------------------------------------------------
 
 @Component({
   selector: 'jta-ticket-detail',
@@ -35,10 +35,8 @@ export class TicketDetail {
   saving = false;          // durum güncelle/sil işlemi
   errorMsg: string | null = null;
 
-  // Form (yalnızca durum güncelleme için)
-  form = this.fb.group({ ticketStatus: [0] });
+  form = this.fb.group({ ticketStatus: [0] });// Form (yalnızca durum güncelleme için)
 
-  // Yardımcılar
   options = TICKET_STATUS_OPTIONS;
   label = statusLabel;
 
@@ -92,7 +90,7 @@ export class TicketDetail {
       });
   }
 
-  /** Sağ üst 'Sil' butonu → onay popup */
+  /** Sağ üst 'Sil' butonu - onay popup */
   confirmDelete() {
     if (!this.ticket) return;
 

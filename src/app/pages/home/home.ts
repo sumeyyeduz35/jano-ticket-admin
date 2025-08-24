@@ -1,8 +1,11 @@
+// Bu bileşen, giriş sonrası ana sayfayı yönetir: JWT içinden kullanıcı adını okur ve çıkış işlemini SweetAlert2 ile onaylar.
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import Swal from 'sweetalert2';
 import { USER_INFO_KEY } from '../login/login.types';
+
+//---------------------------------------------------------------------------------
 
 @Component({
   selector: 'jta-home',
@@ -18,6 +21,7 @@ export class Home implements OnInit {
   constructor(private router: Router) {}
 
   ngOnInit(): void {
+     // localStorage'dan kullanıcı bilgisi çek ve JWT payload'ından userName'i al
     const raw = localStorage.getItem(USER_INFO_KEY);
     if (!raw) return;
     try {
@@ -30,6 +34,7 @@ export class Home implements OnInit {
     }
   }
 
+  // Çıkış akışı (onay → temizle → yönlendir → bilgilendir)
   logout(): void {
     Swal.fire({
       title: 'Çıkış yapmak istiyor musun?',

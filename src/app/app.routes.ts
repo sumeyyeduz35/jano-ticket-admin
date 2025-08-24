@@ -1,3 +1,4 @@
+// Bu dosya, uygulamanın sayfa yönlendirmelerini (router) ve erişim kurallarını tanımlar.
 import { Routes } from '@angular/router';
 import { Login } from './pages/login/login';
 import { Register } from './pages/register/register';
@@ -11,12 +12,12 @@ import { guestGuard } from './guards/guest.guard';
 //---------------------------------------------------------------
 
 export const routes: Routes = [
-  { path: '', pathMatch: 'full', redirectTo: 'login' },
-  { path: 'login', component: Login, canActivate: [guestGuard] },
-  { path: 'register', component: Register, canActivate: [guestGuard] },
-  { path: 'home', component: Home, canActivate: [authGuard] },
-  { path: 'tickets', component: TicketList, canActivate: [authGuard] },
-  { path: 'tickets/new', component: TicketNew, canActivate: [authGuard] },
-  { path: 'tickets/:id', component: TicketDetail, canActivate: [authGuard] },
-  { path: '**', redirectTo: 'login' },
+  { path: '', pathMatch: 'full', redirectTo: 'login' },                   //bos url - login sayfasına yönlendirme
+  { path: 'login', component: Login, canActivate: [guestGuard] },         //sadece msafir kullanıcılar girebilir
+  { path: 'register', component: Register, canActivate: [guestGuard] },   //kayıt sayfası(misafirler için)
+  { path: 'home', component: Home, canActivate: [authGuard] },            //ana sayfa (giris yapmıs kullanıcılar)
+  { path: 'tickets', component: TicketList, canActivate: [authGuard] },   //ticket listesi
+  { path: 'tickets/new', component: TicketNew, canActivate: [authGuard] },//yeni ticket oluşturma
+  { path: 'tickets/:id', component: TicketDetail, canActivate: [authGuard] }, // ticket detay sayfası(ıd ile)
+  { path: '**', redirectTo: 'login' },        //tanımsız rota - login sayfasına yönlendirme
 ];

@@ -1,4 +1,4 @@
-/**
+/** Bu servis, Ticket API ile CRUD işlemlerini (Listeleme, Detay, Oluşturma, Güncelleme, Silme) gerçekleştirir.
  * TicketService
  * - Liste/Detay: GET
  * - Oluşturma:   POST (Success/Error sözleşmesi)
@@ -8,7 +8,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, catchError, map, throwError } from 'rxjs';
-
+import { ConfigService } from './config.service'; // ⬅️ dinamik base URL için
 import {
   ApiItemResponse,
   ApiListResponse,
@@ -19,12 +19,12 @@ import {
   ApiError,
 } from '../ticket.types';
 
-// Mock API kök adresi
-const BASE = 'https://40368fbe-667d-4d7d-b6f6-4bea2bc79a27.mock.pstmn.io';
+//----------------------------------------------------------------------------------
 
 @Injectable({ providedIn: 'root' })
 export class TicketService {
   private http = inject(HttpClient);
+  private cfg = inject(ConfigService); // ⬅️ serviceURL buradan gelecek
 
   /** Ortak HTTP hata işleyici (network/4xx/5xx → ApiError) */
   private handleHttpError = (e: HttpErrorResponse | Error) => {
@@ -36,10 +36,10 @@ export class TicketService {
     return throwError(() => err);
   };
 
-  /** Liste: GET /api/tickets */
+  /** Liste: GET /tickets  (config.serviceURL: .../api) */
   getList(): Observable<Ticket[]> {
     return this.http
-      .get<ApiListResponse<Ticket>>(`${BASE}/api/tickets`)
+      .get<ApiListResponse<Ticket>>(`${this.cfg.serviceURL}/tickets`)
       .pipe(
         map((res) => {
           // Beklenen: { status, message, data: Ticket[] }
@@ -50,10 +50,10 @@ export class TicketService {
       );
   }
 
-  /** Detay: GET /api/tickets/:id */
+  /** Detay: GET /tickets/:id */
   getData(id: string): Observable<Ticket> {
     return this.http
-      .get<ApiItemResponse<Ticket>>(`${BASE}/api/tickets/${id}`)
+      .get<ApiItemResponse<Ticket>>(`${this.cfg.serviceURL}/tickets/${id}`)
       .pipe(
         map((res) => {
           // Beklenen: { status, message, data: Ticket }
@@ -64,10 +64,10 @@ export class TicketService {
       );
   }
 
-  /** Oluştur: POST /api/tickets (Success/Error sözleşmesi) */
+  /** Oluştur: POST /tickets (Success/Error sözleşmesi) */
   create(payload: CreateTicketRequest): Observable<Ticket> {
     return this.http
-      .post<ApiResponse<Ticket>>(`${BASE}/api/tickets`, payload)
+      .post<ApiResponse<Ticket>>(`${this.cfg.serviceURL}/tickets`, payload)
       .pipe(
         map((res) => {
           // Success: { status:'Success', data: Ticket }
@@ -82,15 +82,19 @@ export class TicketService {
       );
   }
 
-  /** Durum güncelle: PUT /api/tickets/:id (item/Success formatlarını destekler) */
+  /** Durum güncelle: PUT /tickets/:id (item/Success formatlarını destekler) */
   updateStatus(id: string, ticketStatus: number): Observable<Ticket> {
+    const url = `${this.cfg.serviceURL}/tickets/${id}`;
+    const body = { ticketStatus };
+
     return this.http
-      .put<ApiItemResponse<Ticket> | ApiResponse<Ticket>>(
-        `${BASE}/api/tickets/${id}`,
-        { ticketStatus }
-      )
+      .put<ApiItemResponse<Ticket> | ApiResponse<Ticket> | Ticket>(url, body)
       .pipe(
         map((res) => {
+          // 0) Bazı mock senaryolarında düz Ticket dönebiliyor
+          if (res && typeof res === 'object' && 'ticketID' in res && 'ticketStatus' in res) {
+            return res as Ticket;
+          }
           // 1) Success sarmalayıcı
           if ((res as ApiSuccess<Ticket>)?.status === 'Success') {
             return (res as ApiSuccess<Ticket>).data;
@@ -107,10 +111,10 @@ export class TicketService {
       );
   }
 
-  /** Sil: DELETE /api/tickets/:id (Success/Error sözleşmesi) */
+  /** Sil: DELETE /tickets/:id (Success/Error sözleşmesi) */
   delete(id: string): Observable<{ ticketID: string; message: string | null }> {
     return this.http
-      .delete<ApiResponse<{ ticketID: string }>>(`${BASE}/api/tickets/${id}`)
+      .delete<ApiResponse<{ ticketID: string }>>(`${this.cfg.serviceURL}/tickets/${id}`)
       .pipe(
         map((res) => {
           // Success: { status:'Success', message, data:{ ticketID } }

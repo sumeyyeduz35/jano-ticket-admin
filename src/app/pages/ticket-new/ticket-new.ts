@@ -1,16 +1,13 @@
-// Amaç: Formdan gelen veriyi backend'e POST ederek yeni ticket oluşturmak.
-// - Success: ID bilgisini göster, liste sayfasına yönlendir
-// - Error: Backend'den gelen mesajı göster
-
+// Bu bileşen, formdaki verilerle yeni bir ticket oluşturur: başarılıysa ID gösterip listeye yönlendirir, hatada mesajı bildirir.
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';                // *ngIf, *ngFor vb.
+import { CommonModule } from '@angular/common';                
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import Swal from 'sweetalert2';
-
-// Servis ve tipler
 import { TicketService } from '../../services/tickets.service'; 
 import { CreateTicketRequest, Ticket, ApiError } from '../../ticket.types';
+
+//----------------------------------------------------------------------
 
 @Component({
   selector: 'jta-ticket-new',

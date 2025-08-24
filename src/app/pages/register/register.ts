@@ -1,8 +1,11 @@
+// Bu bileşen, kullanıcı kayıt formunu yönetir: şifre eşleşmesi doğrulaması, uyarılar ve başarılı kayıt sonrası yönlendirme.
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import Swal from 'sweetalert2';
 import { NgIf } from '@angular/common';
+
+//---------------------------------------------------------------------------
 
 // Şifre eşleşme kontrolü
 const passwordMatchValidator = (): ValidatorFn => {
@@ -28,10 +31,11 @@ export class Register {
 
   loading = false;
 
+  //form tanımı + grup seviyesinde şifre eşlemesi doğrulaması
   form = this.fb.group({
-    username: ['', Validators.required],
-    password: ['', Validators.required],
-    confirmPassword: ['', Validators.required],
+    username: ['', Validators.required],        //kullanıcı adı(zorunlu)
+    password: ['', Validators.required],        //şifre(zorunlu)
+    confirmPassword: ['', Validators.required], //şifre tekrar(zorunlu)
   }, { validators: passwordMatchValidator() });
 
   get f() { return this.form.controls; }
@@ -72,12 +76,10 @@ export class Register {
         timer: 1500,
         showConfirmButton: false
       }).then(() => {
-        this.router.navigateByUrl('/login');
+        this.router.navigateByUrl('/login');  //login sayfasına yönlendir
       });
 
     }, 1000);
 
-    // API entegrasyonu yapıldığında:
-    // this.registerService.signUp(this.form.value).subscribe(...)
   }
 }

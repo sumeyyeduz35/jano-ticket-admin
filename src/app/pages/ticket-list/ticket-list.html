@@ -19,16 +19,20 @@
         <th>Gönderen E-Posta Adresi</th>
         <th>Ticket Durumu</th>
         <th>Gönderilme Tarihi</th>
-        <th style="width:140px;">İşlem</th>
+        <th style="width:200px;">İşlem</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let t of tickets" class="hover:bg-gray-50">
         <td>{{ t.title }}</td>
-        <td>{{ t.description }}</td>
+        <td class="max-w-[420px] truncate" title="{{ t.description }}">{{ t.description }}</td>
         <td>{{ t.senderFullName }}</td>
         <td>{{ t.senderEmail }}</td>
-        <td>{{ label(t.ticketStatus) }}</td>
+        <td>
+          <span class="inline-block px-2 py-1 rounded border text-sm">
+            {{ label(t.ticketStatus) }} ({{ t.ticketStatus }})
+          </span>
+        </td>
         <td>{{ t.createdAt | date:'short' }}</td>
         <td class="space-x-2">
           <!-- Detay linki -->
@@ -45,9 +49,22 @@
             type="button"
             class="text-red-600 underline"
             (click)="confirmDelete(t)"
+            [disabled]="isUpdating(t.ticketID)"
             aria-label="Ticket'ı sil"
           >
             Sil
+          </button>
+
+          <!-- Durumu 3 (Resolved) yap -->
+          <button
+            type="button"
+            class="text-green-700 underline"
+            (click)="setResolved(t)"
+            [disabled]="isUpdating(t.ticketID) || t.ticketStatus === 3"
+            aria-label="Durumu Resolved (3) yap"
+            title="Durumu Resolved (3) yap"
+          >
+            Resolved (3)
           </button>
         </td>
       </tr>

@@ -1,5 +1,5 @@
+//Bu dosya, login bileşeni/servisi için basit bir test senaryosu içerir.
 import { TestBed } from '@angular/core/testing';
-
 import { Login } from './login';
 
 describe('Login', () => {

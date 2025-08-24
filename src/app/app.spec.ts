@@ -1,10 +1,13 @@
+//Bu dosya, app bileşeninin (root component) test senaryolarını içerir.
 import { TestBed } from '@angular/core/testing';
 import { App } from './app';
+
+//---------------------------------------------------------------------
 
 describe('App', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [App],
+      imports: [App],  //test ortamına app bileşeni ekleniyor
     }).compileComponents();
   });
 

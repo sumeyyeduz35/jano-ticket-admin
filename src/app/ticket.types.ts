@@ -1,3 +1,5 @@
+// Bu dosya, Ticket yapısının tip tanımlarını ve API yanıt modellerini içerir.
+
 /**
  * Tek bir ticket kaydının tip tanımı
  */
@@ -9,8 +11,8 @@ export interface Ticket {
   senderEmail: string;
   ticketStatus: number;           // 0: Yeni, 1: Aktif, 2: İptal Edildi, 3: Çözüldü
   assignedUserId?: string | null; // Opsiyonel atanmış kullanıcı
-  createdAt: string;              // ISO datetime
-  updatedAt?: string | null;      // ISO datetime | null
+  createdAt: string;              // ISO datetime         /  oluşturulma tarihi
+  updatedAt?: string | null;      // ISO datetime | null  /  güncellenme tarihi
 }
 
 /**
@@ -34,7 +36,6 @@ export interface CreateTicketRequest {
 
 /**
  * Servis tarafında daha okunaklı olsun diye alias.
- * (İstersen ilerde CreateTicketRequest yerine bunu kullanırsın.)
  */
 export type NewTicketRequest = CreateTicketRequest;
 

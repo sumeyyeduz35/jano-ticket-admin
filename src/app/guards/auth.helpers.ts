@@ -1,13 +1,19 @@
+/**Bu dosya, oturum kontrolü için yardımcı fonksiyonları içerir.
+Buradaki hasValidSession() fonksiyonu, localStorage’daki JWT token’ı kontrol ederek
+oturumun geçerli olup olmadığını belirler.*/
+
 import { USER_INFO_KEY } from '../pages/login/login.types';
 
+
+// geçerli bir oturum var mı kontrol eder
 export function hasValidSession(): boolean {
   const raw = localStorage.getItem(USER_INFO_KEY);
   if (!raw) return false;
 
   try {
-    const parsed = JSON.parse(raw);
+    const parsed = JSON.parse(raw);  //json parse edilir
     const token: string | undefined = parsed?.token;
-    if (!token) return false;
+    if (!token) return false;         //token yoksa oturum geçersiz
 
     // exp kontrolü (JWT payload decode)
     const payloadPart = token.split('.')[1];
@@ -25,8 +31,8 @@ export function hasValidSession(): boolean {
         return false;
       }
     }
-    return true;
+    return true;  //token geçerli - oturum var
   } catch {
-    return false;
+    return false; //parse hatası - oturum geçersiz
   }
 }
